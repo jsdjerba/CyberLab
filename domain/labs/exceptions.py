@@ -109,3 +109,4 @@ class StepAlreadyCompleted(LabDomainError):
 
 class InvalidLabState(LabDomainError):
     pass
+

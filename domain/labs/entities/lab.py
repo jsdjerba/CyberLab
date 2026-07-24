@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from domain.labs.value_objects.lab_id import LabId
 from domain.labs.value_objects.step_id import StepId
 from domain.labs.entities.step import Step
@@ -14,7 +14,11 @@ class Lab:
         description: str,
         difficulty: str,
         duration: int,
-        steps: List[Step]
+        steps: List[Step],
+        is_published: bool = True,
+        required_level: str = "BEGINNER",
+        required_lab_ids: Optional[tuple[str, ...]] = None,
+        allowed_classrooms: Optional[tuple[str, ...]] = None
     ):
         self.id = id
         self.title = title
@@ -22,10 +26,31 @@ class Lab:
         self.difficulty = difficulty
         self.duration = duration
         self.steps = list(steps)
+        self._is_published = is_published
+        self._required_level = required_level
+        self._required_lab_ids = required_lab_ids or ()
+        self._allowed_classrooms = allowed_classrooms
 
+    @property
     def total_points(self) -> int:
         """Calcule le score maximum possible pour ce laboratoire."""
         return sum(step.points for step in self.steps)
+
+    @property
+    def is_published(self) -> bool:
+        return self._is_published
+
+    @property
+    def required_level(self) -> str:
+        return self._required_level
+
+    @property
+    def required_lab_ids(self) -> tuple[str, ...]:
+        return self._required_lab_ids
+
+    @property
+    def allowed_classrooms(self) -> Optional[tuple[str, ...]]:
+        return self._allowed_classrooms
 
     def get_steps(self) -> tuple[Step, ...]:
         """Expose les étapes sous forme de collection immuable."""
