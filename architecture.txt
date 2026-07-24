@@ -1,0 +1,66 @@
+CyberLab/
+├── config/
+│   ├── __init__.py
+│   └── settings.py
+│
+├── core/
+│   ├── __init__.py
+│   ├── app_factory.py
+│   ├── blueprint_loader.py
+│   ├── error_handlers.py
+│   ├── exceptions.py
+│   └── extensions.py
+│
+├── database/
+│   ├── __init__.py
+│   ├── base.py
+│   ├── connection.py
+│   ├── session.py
+│   ├── unit_of_work.py
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── achievement.py
+│   │   ├── classroom.py
+│   │   ├── enrollment.py
+│   │   ├── enums.py
+│   │   ├── flag.py
+│   │   ├── lab.py
+│   │   ├── progress.py
+│   │   ├── team.py
+│   │   └── user.py
+│   └── types/
+│       ├── __init__.py
+│       └── utc_datetime.py          <-- Le fichier est bien ici maintenant
+│
+├── repositories/
+│   ├── __init__.py
+│   ├── base_repository.py           <-- Le repo de base reste à la racine de repositories
+│   ├── interfaces/
+│   │   ├── __init__.py
+│   │   ├── achievement_repository_interface.py
+│   │   ├── base_repository_interface.py
+│   │   ├── classroom_repository_interface.py
+│   │   ├── enrollment_repository_interface.py
+│   │   ├── lab_repository_interface.py
+│   │   ├── progress_repository_interface.py
+│   │   └── user_repository_interface.py
+│   └── sqlalchemy/
+│       ├── __init__.py
+│       ├── achievement_repository.py
+│       ├── classroom_repository.py
+│       ├── enrollment_repository.py
+│       ├── lab_repository.py
+│       ├── progress_repository.py
+│       └── user_repository.py
+│
+├── tests/
+│   ├── __init__.py                  <-- (Optionnel mais recommandé)
+│   ├── test_architecture.py
+│   ├── test_database.py
+│   ├── test_datetime.py
+│   ├── test_models.py
+│   ├── test_repositories.py
+│   └── test_transactions.py
+│
+├── pytest.ini                       <-- À la racine du projet
+└── requirements.txt                 <-- À la racine du projet

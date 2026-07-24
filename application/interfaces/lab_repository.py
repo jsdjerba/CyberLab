@@ -1,0 +1,6 @@
+from typing import Protocol, Optional, List
+from domain.entities.lab import Lab
+
+class ILabRepository(Protocol):
+    def get_by_id(self, lab_id: str) -> Optional[Lab]: ...
+    def list_available(self) -> List[Lab]: ...

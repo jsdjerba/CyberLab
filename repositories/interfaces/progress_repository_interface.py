@@ -1,0 +1,30 @@
+from typing import Protocol, Optional, List
+from domain.progress.entities.progress import Progress
+
+
+class IProgressRepository(Protocol):
+
+    def get_by_id(
+        self,
+        progress_id: str
+    ) -> Optional[Progress]:
+        ...
+
+    def get_by_student_and_lab(
+        self,
+        student_id: str,
+        lab_id: str
+    ) -> Optional[Progress]:
+        ...
+
+    def save(
+        self,
+        progress: Progress
+    ) -> None:
+        ...
+
+    def list_by_student(
+        self,
+        student_id: str
+    ) -> List[Progress]:
+        ...

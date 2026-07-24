@@ -1,0 +1,22 @@
+cyberlab/
+├── domain/plugins/
+│   ├── entities/plugin.py
+│   ├── factories/plugin_factory.py
+│   ├── value_objects/
+│   │   ├── plugin_id.py
+│   │   └── plugin_version.py
+│   └── exceptions.py
+├── application/
+│   ├── plugins/
+│   │   └── registry.py
+│   └── plugin_service.py
+├── infrastructure/
+│   └── plugins/
+│       ├── schema/
+│       │   └── plugin_manifest.schema.json
+│       ├── filesystem_loader.py
+│       └── manifest_validator.py
+└── tests/
+    ├── domain/test_plugin.py
+    ├── infrastructure/test_plugin_loader.py
+    └── application/test_plugin_service.py

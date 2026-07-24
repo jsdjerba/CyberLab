@@ -1,0 +1,33 @@
+cyberlab/
+├── domain/
+│   └── labs/
+│       ├── __init__.py
+│       ├── exceptions.py
+│       ├── entities/
+│       │   ├── __init__.py
+│       │   ├── lab.py
+│       │   ├── lab_instance.py
+│       │   └── step.py
+│       ├── value_objects/
+│       │   ├── __init__.py
+│       │   ├── lab_id.py
+│       │   ├── step_id.py
+│       │   ├── lab_status.py
+│       │   └── step_type.py
+│       ├── events/
+│       │   ├── __init__.py
+│       │   ├── lab_started.py
+│       │   ├── step_completed.py
+│       │   └── lab_finished.py
+│       └── policies/
+│           ├── __init__.py
+│           ├── grading_policy.py
+│           └── submission_policy.py
+└── tests/
+    └── domain/
+        └── labs/
+            ├── __init__.py
+            ├── test_lab.py
+            ├── test_lab_instance.py
+            ├── test_events.py
+            └── test_policies.py

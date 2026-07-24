@@ -1,0 +1,17 @@
+# Environnement virtuel
+venv/
+.venv/
+env/
+
+# Python / Flask
+__pycache__/
+*.pyc
+*.pyo
+instance/
+
+# Bases de données locales
+*.db
+*.sqlite3
+
+# Variables d'environnement
+.env

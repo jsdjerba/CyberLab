@@ -1,0 +1,14 @@
+CyberLab/
+├── database/
+│   ├── unit_of_work.py
+│   ├── session.py
+│   ├── models/ [user.py, classroom.py, enrollment.py, team.py, lab.py, flag.py, progress.py, achievement.py]
+│   └── types/utc_datetime.py
+├── repositories/
+│   ├── base_repository.py
+│   ├── interfaces/ [IUserRepository, IClassroomRepository, etc.]
+│   └── sqlalchemy/ [UserRepository, ClassroomRepository, etc.]
+└── tests/
+    ├── test_architecture.py
+    ├── test_transactions.py
+    └── test_datetime.py
