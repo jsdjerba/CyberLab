@@ -15,3 +15,6 @@ instance/
 
 # Variables d'environnement
 .env
+
+# Sauvegardes
+sauvegardes/

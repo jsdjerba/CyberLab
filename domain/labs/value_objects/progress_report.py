@@ -1,12 +1,21 @@
 from dataclasses import dataclass
-from typing import List
 from domain.labs.value_objects.step_id import StepId
 
 @dataclass(frozen=True)
 class ProgressReport:
-    """Représente l'état d'avancement calculé d'un apprenant."""
+    """Value Object immuable représentant l'état de progression d'un laboratoire."""
     completion_percentage: float
-    completed_steps: List[StepId]
-    remaining_steps: List[StepId]
-    next_available_steps: List[StepId]
+    completed_steps: tuple[StepId, ...]
+    remaining_steps: tuple[StepId, ...]
+    next_available_steps: tuple[StepId, ...]
     is_finished: bool
+    completed_count: int
+    remaining_count: int
+
+    @property
+    def total_steps(self) -> int:
+        return self.completed_count + self.remaining_count
+
+    @property
+    def has_remaining_steps(self) -> bool:
+        return self.remaining_count > 0

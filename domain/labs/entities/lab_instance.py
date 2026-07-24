@@ -31,15 +31,15 @@ class LabInstance:
         self._current_step = current_step
         self._completed_steps = list(completed_steps) if completed_steps else []
         
-        # --- CORRECTION ICI : on force le typage des clés en string ---
         self._attempts_count = {
             (k.value if hasattr(k, 'value') else str(k)): v 
             for k, v in (attempts or {}).items()
         }
         
-        self._last_attempt_times = dict(last_attempt_times) if last_attempt_times else {}
+        self._last_attempt_times: Dict[str, datetime] = dict(last_attempt_times) if last_attempt_times else {}
         self._events: List[Any] = []
         self._score = score
+
     @property
     def id(self) -> str:
         return self._id
@@ -86,13 +86,28 @@ class LabInstance:
 
     @property
     def attempts(self) -> Dict[str, int]:
-        """Copie sécurisée des tentatives pour la rétrocompatibilité."""
         return dict(self._attempts_count)
 
     @attempts.setter
-    def attempts(self, attempts_dict: Dict[str, int]) -> None:
-        """Setter utilisé par le repository SQLAlchemy pour la reconstitution."""
-        self._attempts_count = dict(attempts_dict)
+    def attempts(self, attempts_dict: Dict[Any, int]) -> None:
+        self._attempts_count = {
+            (k.value if hasattr(k, 'value') else str(k)): v 
+            for k, v in attempts_dict.items()
+        }
+
+    # --- NOUVELLES MÉTHODES D'ENCAPSULATION POUR LE PROGRESS SERVICE ---
+    
+    def get_completed_steps(self) -> tuple[StepId, ...]:
+        """Retourne une copie immuable des étapes complétées."""
+        return tuple(self._completed_steps)
+
+    def is_step_completed(self, step_id: StepId) -> bool:
+        return step_id in self._completed_steps
+
+    def completed_steps_count(self) -> int:
+        return len(self._completed_steps)
+
+    # -------------------------------------------------------------------
 
     def get_attempt_count(self, step_id: StepId) -> int:
         key = step_id.value if hasattr(step_id, 'value') else str(step_id)
@@ -148,7 +163,6 @@ class LabInstance:
         if self._current_step != step_id:
             raise InvalidStepTransition(f"Impossible de valider l'étape, attendu: {self._current_step}")
 
-        # Recherche de l'étape pour récupérer ses points
         step = next((s for s in lab.steps if s.id == step_id), None)
         if not step:
             raise StepNotFound("L'étape n'existe pas dans le laboratoire.")
@@ -158,14 +172,12 @@ class LabInstance:
         
         step_str = step_id.value if hasattr(step_id, 'value') else str(step_id)
 
-        # --- CORRECTION STRICTE DES PARAMÈTRES DE L'ÉVÉNEMENT ---
         self._events.append(StepCompleted(
             lab_instance_id=self._id, 
             step_id=step_str, 
             score_awarded=step.points
         ))
 
-        # Vérification si c'était la dernière étape
         current_index = lab.steps.index(step)
         if current_index + 1 >= len(lab.steps):
             self.complete()
@@ -194,7 +206,6 @@ class LabInstance:
         attempts: Dict[str, int], 
         score: int = 0
     ) -> 'LabInstance':
-        """Méthode de fabrique utilisée par le repository pour reconstruire l'agrégat depuis la BDD."""
         return cls(
             id=id,
             student_id=student_id,
