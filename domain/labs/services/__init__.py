@@ -4,6 +4,7 @@ from domain.labs.services.attempt_policy_service import AttemptPolicyService
 from domain.labs.services.progress_service import ProgressService
 from domain.labs.services.flag_validation_service import FlagValidationService
 from domain.labs.services.eligibility_service import LabEligibilityService
+from domain.labs.services.achievement_service import AchievementService
 
 __all__ = [
     "LabLifecycleService",
@@ -11,5 +12,6 @@ __all__ = [
     "AttemptPolicyService",
     "ProgressService",
     "FlagValidationService",
-    "LabEligibilityService"
+    "LabEligibilityService",
+    "AchievementService"
 ]
