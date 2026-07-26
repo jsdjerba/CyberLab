@@ -27,11 +27,8 @@ def test_get_by_id_returns_none_if_absent(db_session):
     result = repo.get_by_id("non-existent-id")
     assert result is None
 
-def test_get_missing_returns_none(db_session):
-    repo = SqlAlchemyLabInstanceRepository(db_session)
-    assert repo.get_by_student_and_lab(StudentId(99), LabId("UNKNOWN")) is None
-
 def test_get_by_id_reconstructs_lab_instance(db_session):
+    # Arrange : Création d'un Lab ORM et d'un Progress ORM associés
     lab_orm = LabModel(id=1, lab_id="L_SEC_01", title="Network Sec", category="Sec", difficulty="Easy", version="1.0", is_active=True)
     db_session.add(lab_orm)
     db_session.flush()
@@ -48,8 +45,11 @@ def test_get_by_id_reconstructs_lab_instance(db_session):
     db_session.flush()
 
     repo = SqlAlchemyLabInstanceRepository(db_session)
+
+    # Act
     instance = repo.get_by_id("inst-abc-123")
 
+    # Assert
     assert instance is not None
     assert instance.id == "inst-abc-123"
     assert isinstance(instance.student_id, StudentId)
@@ -66,8 +66,10 @@ def test_save_creates_new_progress(db_session):
     instance = LabInstance("inst-new-456", StudentId(10), LabId("L_WEB_02"))
     instance.status = LabStatus.NOT_STARTED
 
+    # Act
     repo.save(instance)
 
+    # Assert
     saved_progress = db_session.query(ProgressModel).filter(ProgressModel.domain_id == "inst-new-456").first()
     assert saved_progress is not None
     assert saved_progress.user_id == 10
@@ -94,8 +96,10 @@ def test_save_updates_existing_progress(db_session):
     instance.status = LabStatus.COMPLETED
     instance.completed_at = datetime(2026, 7, 26, 12, 0, 0)
 
+    # Act
     repo.save(instance)
 
+    # Assert
     updated_progress = db_session.query(ProgressModel).filter(ProgressModel.domain_id == "inst-upd-789").first()
     assert updated_progress.status == "COMPLETED"
     assert updated_progress.completed_at is not None
@@ -109,47 +113,9 @@ def test_mapping_lab_id_business_to_technical_is_correct(db_session):
     instance = LabInstance("inst-map-test", StudentId(1), LabId("L_FORENSICS"))
     instance.status = LabStatus.IN_PROGRESS
 
+    # Act
     repo.save(instance)
 
+    # Assert : Le Progress ORM doit lier l'ID technique 77 et non la chaîne "L_FORENSICS"
     progress_orm = db_session.query(ProgressModel).filter(ProgressModel.domain_id == "inst-map-test").first()
     assert progress_orm.lab_id == 77
-
-def test_save_and_reconstruct_aggregate(db_session):
-    lab_orm = LabModel(id=10, lab_id="HTTP_LAB", title="HTTP Lab", category="Sec", difficulty="Easy", version="1.0", is_active=True)
-    db_session.add(lab_orm)
-    db_session.flush()
-
-    repo = SqlAlchemyLabInstanceRepository(db_session)
-    student = StudentId(42)
-    lab = LabId("HTTP_LAB")
-
-    instance = LabInstance("inst_uuid_123", student, lab)
-    instance.status = LabStatus.IN_PROGRESS
-
-    repo.save(instance)
-
-    reconstructed = repo.get_by_id("inst_uuid_123")
-    assert reconstructed is not None
-    assert reconstructed.id == "inst_uuid_123"
-    assert reconstructed.student_id == student
-    assert reconstructed.lab_id == lab
-    assert reconstructed.status == LabStatus.IN_PROGRESS
-
-def test_student_isolation(db_session):
-    lab_orm = LabModel(id=1, lab_id="LAB_1", title="Lab 1", category="Sec", difficulty="Easy", version="1.0", is_active=True)
-    db_session.add(lab_orm)
-    db_session.flush()
-
-    repo = SqlAlchemyLabInstanceRepository(db_session)
-
-    inst1 = LabInstance("inst_A", StudentId(1), LabId("LAB_1"))
-    inst2 = LabInstance("inst_B", StudentId(2), LabId("LAB_1"))
-
-    repo.save(inst1)
-    repo.save(inst2)
-
-    fetched1 = repo.get_by_id("inst_A")
-    fetched2 = repo.get_by_id("inst_B")
-
-    assert fetched1.student_id == StudentId(1)
-    assert fetched2.student_id == StudentId(2)

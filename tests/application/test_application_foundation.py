@@ -12,7 +12,8 @@ from application.dtos.step_result_dto import StepResultDto
 from application.dtos.lab_result_dto import LabResultDto
 from application.dtos.achievement_dto import AchievementDto
 from application.mappers.domain_to_dto import DomainToDtoMapper
-from application.exceptions.application_errors import LabNotFoundError, LabInstanceNotFoundError, StudentNotFoundError
+from domain.exceptions import LabInstanceNotFoundError, LabNotFoundError, StudentNotFoundError
+
 from application.use_cases.submit_flag_use_case import SubmitFlagUseCase
 
 def test_commands_immutability():
@@ -45,13 +46,20 @@ def test_submit_flag_use_case_skeleton_raises_not_found():
         def get_by_id(self, lab_id): return None
     class DummyInstanceRepo:
         def get_by_id(self, instance_id): return None
+    class DummyStudentRepo:
+        def get_history(self, student_id): return None
     class DummyEventBus:
         def publish(self, events): pass
 
     use_case = SubmitFlagUseCase(
         lab_repository=DummyLabRepo(), # type: ignore
         lab_instance_repository=DummyInstanceRepo(), # type: ignore
-        event_bus=DummyEventBus() # type: ignore
+        student_repository=DummyStudentRepo(), # type: ignore
+        event_bus=DummyEventBus(), # type: ignore
+        attempt_policy_service=None, # type: ignore
+        challenge_validation_port=None, # type: ignore
+        scoring_service=None, # type: ignore
+        achievement_service=None # type: ignore
     )
 
     command = SubmitFlagCommand(instance_id="unknown", step_id=StepId("s1"), submitted_flag="FLAG{}")

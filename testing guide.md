@@ -8,6 +8,10 @@ Ce guide décrit la procédure de test étape par étape pour valider la couche 
 - Environnement virtuel activé.
 
 ---
+## Activation de l'environnement
+ venv\Scripts\activate
+
+
 
 ## Étape 1 : Audit de l'Architecture
 Vérifie que les règles de Clean Architecture sont respectées (pas de `commit` dans les repos, pas de dépendances interdites).
