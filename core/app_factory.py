@@ -7,6 +7,7 @@ from config.settings import config_by_name, BaseConfig
 from core.extensions import register_extensions
 from core.blueprint_loader import register_blueprints
 from api.error_handlers import register_error_handlers
+from bootstrap.container import Container  # Ajout de l'import du Container
 
 def configure_logging(app: Flask) -> None:
     if app.logger.handlers:
@@ -38,9 +39,12 @@ def create_app(config_name: str = 'default') -> Flask:
     
     configure_logging(app)
     
-    # Suppression de l'import direct de database.models pour respecter l'isolation
-    
     register_extensions(app)
+    
+    # Séquence obligatoire validée de la Composition Root
+    container = Container(app.db_session)
+    app.extensions["container"] = container
+    
     register_blueprints(app)
     register_error_handlers(app)
     

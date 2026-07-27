@@ -1,30 +1,32 @@
 from typing import Optional, Any
-from domain.labs.entities.lab import Lab
+from domain.labs.entities.lab import Lab as DomainLab
 from domain.labs.value_objects.lab_id import LabId
 from database.models.lab import Lab as LabModel
 
 class SqlAlchemyLabRepository:
     """
-    Implémentation SQLAlchemy de LabRepository.
-    Mappe le modèle ORM Lab vers l'entité Domain Lab.
+    Implémentation SQLAlchemy de LabRepository pour la gestion des laboratoires.
     """
+
     def __init__(self, session: Any):
         self._session = session
 
-    def get_by_id(self, lab_id: LabId) -> Optional[Lab]:
-        # Recherche par l'identifiant textuel métier 'lab_id' (ex: 'L1')
-        target_id = lab_id.value if hasattr(lab_id, 'value') else str(lab_id)
+    def get_by_id(self, lab_id: LabId) -> Optional[DomainLab]:
+        lab_id_value = lab_id.value if hasattr(lab_id, 'value') else str(lab_id)
         
-        lab_model = self._session.query(LabModel).filter(LabModel.lab_id == target_id).first()
+        lab_model = self._session.query(LabModel).filter(
+            LabModel.lab_id == lab_id_value
+        ).first()
+
         if not lab_model:
             return None
 
-        # Reconstitution de l'entité Domain Lab selon sa signature réelle exacte
-        return Lab(
+        # Instanciation complète de l'entité domaine avec tous ses arguments obligatoires
+        return DomainLab(
             id=LabId(lab_model.lab_id),
-            title=lab_model.title,
-            description=getattr(lab_model, "description", ""), # Sécurisé si la colonne optionnelle
-            difficulty=lab_model.difficulty,
-            duration=getattr(lab_model, "duration", 0),       # Valeur par défaut si absente du modèle ORM
-            steps=[]                                          # Les steps seront gérés/chargés si nécessaire par une relation dédiée
+            title=getattr(lab_model, 'title', ''),
+            description=getattr(lab_model, 'description', ''),
+            difficulty=getattr(lab_model, 'difficulty', 'Easy'),
+            duration=getattr(lab_model, 'duration', 0),
+            steps=getattr(lab_model, 'steps', [])
         )
