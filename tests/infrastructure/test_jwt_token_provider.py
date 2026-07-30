@@ -8,7 +8,16 @@ def test_jwt_token_creation_and_payload():
     provider = JwtTokenProvider(secret=SECURE_TEST_SECRET, expires_in_seconds=3600)
     token = provider.create_token(user_id="u-123", role="ADMIN")
     
-    decoded = jwt.decode(token, SECURE_TEST_SECRET, algorithms=["HS256"])
+    # La sécurité Enterprise exige la validation stricte de l'audience et de l'issuer
+    decoded = jwt.decode(
+        token, 
+        SECURE_TEST_SECRET, 
+        algorithms=["HS256"],
+        audience="cyberlab-api",
+        issuer="cyberlab-auth"
+    )
+    
     assert decoded["sub"] == "u-123"
-    assert decoded["role"] == "ADMIN"
+    assert decoded["roles"][0] == "ADMIN" # Modification Phase 5.5 : les rôles sont une liste
     assert "exp" in decoded
+    assert "jti" in decoded

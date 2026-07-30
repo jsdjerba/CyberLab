@@ -1,0 +1,16 @@
+application/
+└── dto/
+    └── token_payload.py          # NOUVEAU
+
+presentation/
+└── security/
+    ├── __init__.py
+    ├── current_user.py           # NOUVEAU
+    ├── jwt_guard.py              # NOUVEAU
+    ├── role_guard.py             # NOUVEAU
+    └── security_exceptions.py    # NOUVEAU
+
+tests/presentation/security/
+    ├── test_jwt_guard.py         # NOUVEAU
+    ├── test_role_guard.py        # NOUVEAU
+    └── test_protected_routes.py  # NOUVEAU

@@ -8,18 +8,19 @@ from infrastructure.database import SessionLocal
 from infrastructure.persistence.repositories.sqlalchemy_lab_instance_repository import SqlAlchemyLabInstanceRepository
 from infrastructure.transaction.sqlalchemy_unit_of_work import SqlAlchemyUnitOfWork
 
-# --- Nouveaux imports Phase 5.3 (Infrastructure Auth) ---
+# --- Imports Phase 5.3 & 5.5 (Infrastructure Auth & Audit) ---
 from infrastructure.identity.uuid_id_generator import UuidIdGenerator
 from infrastructure.security.bcrypt_password_hasher import BcryptPasswordHasher
 from infrastructure.security.jwt_token_provider import JwtTokenProvider
 from infrastructure.persistence.repositories.sqlalchemy_user_repository import SqlAlchemyUserRepository
+from infrastructure.persistence.repositories.sqlalchemy_audit_repository import SqlAlchemyAuditRepository
 
+# --- Imports Application Services & Use Cases ---
+from application.services.security_service import SecurityService
 from application.use_cases.create_lab_instance import CreateLabInstanceUseCase
 from application.use_cases.start_lab import StartLabUseCase
 from application.use_cases.submit_flag import SubmitFlagUseCase
 from application.use_cases.get_lab_instance import GetLabInstanceUseCase
-
-# --- Nouveaux imports Phase 5.2 (Use Cases Auth) ---
 from application.use_cases.register_user import RegisterUserUseCase
 from application.use_cases.login_user import LoginUserUseCase
 
@@ -35,8 +36,9 @@ class ApplicationContainer:
         self._uow = SqlAlchemyUnitOfWork(self._session)
         self._validator = validator
 
-        # --- Nouvelles dépendances (Auth Phase 5.3) ---
+        # --- Nouvelles dépendances (Auth & Audit Phase 5.3 & 5.5) ---
         self._user_repository = SqlAlchemyUserRepository(self._session)
+        self._audit_repository = SqlAlchemyAuditRepository(self._session)
         self._password_hasher = BcryptPasswordHasher()
         self._id_generator = UuidIdGenerator()
         # En production, ce secret devra être injecté via les variables d'environnement (min 32 caractères)
@@ -49,6 +51,15 @@ class ApplicationContainer:
     @property
     def repository(self) -> SqlAlchemyLabInstanceRepository:
         return self._repository
+
+    @property
+    def security_service(self) -> SecurityService:
+        """Expose proprement le service de sécurité."""
+        return SecurityService(
+            token_provider=self._token_provider,
+            user_repository=self._user_repository,
+            audit_repository=self._audit_repository
+        )
 
     # --- Factory Methods (Lab) ---
     def create_lab_instance_use_case(self) -> CreateLabInstanceUseCase:

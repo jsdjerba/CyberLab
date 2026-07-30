@@ -1,8 +1,8 @@
-"""
-Port applicatif pour la génération de jetons d'authentification (ex: JWT).
-"""
+"""Port applicatif pour la gestion des jetons d'authentification."""
 from typing import Protocol
+from application.dto.token_payload import TokenPayload
 
 class TokenProvider(Protocol):
-    def create_token(self, user_id: str, role: str) -> str:
-        ...
+    def create_token(self, user_id: str, role: str) -> str: ...
+    def decode_token(self, token: str) -> TokenPayload: ...
+    def validate_token(self, token: str) -> bool: ...

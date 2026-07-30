@@ -18,3 +18,11 @@ instance/
 
 # Sauvegardes
 sauvegardes/
+
+
+# Variables d'environnement
+.env
+
+# Dossiers de tests et de couverture
+.pytest_cache/
+htmlcov/

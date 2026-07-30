@@ -1,16 +1,27 @@
-presentation/
-├── api/
-│   └── v1/
-│       ├── __init__.py
-│       └── auth_routes.py
-├── schemas/
-│   ├── __init__.py
-│   └── auth_schema.py
-└── error_handlers/
-    ├── __init__.py
-    └── api_exception_handler.py
+domain/
+├── value_objects/
+│   ├── permission.py              # NOUVEAU
+│   └── role.py                    # MODIFIÉ
+└── entities/
+    └── audit_event.py             # NOUVEAU
 
-tests/presentation/
-├── test_auth_register_api.py
-├── test_auth_login_api.py
-└── test_auth_errors_api.py
+application/
+├── exceptions/
+│   └── security_exceptions.py     # NOUVEAU
+├── dto/
+│   └── auth_context.py            # NOUVEAU
+├── ports/
+│   └── audit_repository.py        # NOUVEAU
+└── services/
+    └── security_service.py        # NOUVEAU
+
+infrastructure/
+├── persistence/
+│   ├── models/audit_model.py      # NOUVEAU
+│   └── repositories/sqlalchemy_audit_repository.py # NOUVEAU
+└── security/jwt_token_provider.py # MODIFIÉ
+
+presentation/
+├── security/
+│   ├── current_user.py            # MODIFIÉ
+│   └── guards.py                  # MODIFIÉ (Regroupement)

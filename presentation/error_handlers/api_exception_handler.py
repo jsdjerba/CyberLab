@@ -4,12 +4,31 @@ Empêche les détails d'implémentation de fuiter vers le client.
 """
 from flask import jsonify
 from jsonschema.exceptions import ValidationError as JsonSchemaValidationError
+
+# --- Exceptions Domaine/Use Cases Existantes ---
 from domain.exceptions.auth_exceptions import (
     DuplicateUserException, UserNotFoundException,
     InvalidPasswordException, AuthenticationError
 )
 
+# --- Nouvelles Exceptions de Sécurité Enterprise (Phase 5.5) ---
+from application.exceptions.security_exceptions import TokenError, AuthorizationError
+
+
 def register_api_error_handlers(app_or_blueprint):
+    
+    # --- Gestionnaires de Sécurité (Phase 5.5) ---
+    @app_or_blueprint.errorhandler(TokenError)
+    def handle_token_error(error):
+        # Intercepte: MissingTokenError, MalformedTokenError, ExpiredTokenError, InvalidTokenError, TokenRevokedError
+        return jsonify({"error": "Unauthorized", "message": str(error)}), 401
+
+    @app_or_blueprint.errorhandler(AuthorizationError)
+    def handle_authorization_error(error):
+        # Intercepte: ForbiddenRoleError, ForbiddenPermissionError
+        return jsonify({"error": "Forbidden", "message": str(error)}), 403
+
+    # --- Gestionnaires Métier Existants ---
     @app_or_blueprint.errorhandler(DuplicateUserException)
     def handle_duplicate_user(error):
         return jsonify({"error": "Conflict", "message": str(error)}), 409

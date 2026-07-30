@@ -1,0 +1,16 @@
+"""Permissions granulaires de la plateforme (Enterprise RBAC)."""
+from enum import Enum
+
+class Permission(Enum):
+    CREATE_CLASSROOM = "CREATE_CLASSROOM"
+    DELETE_CLASSROOM = "DELETE_CLASSROOM"
+    CREATE_TEAM = "CREATE_TEAM"
+    DELETE_TEAM = "DELETE_TEAM"
+    CREATE_LAB = "CREATE_LAB"
+    DELETE_LAB = "DELETE_LAB"
+    START_LAB = "START_LAB"
+    STOP_LAB = "STOP_LAB"
+    SUBMIT_FLAG = "SUBMIT_FLAG"
+    VIEW_REPORTS = "VIEW_REPORTS"
+    MANAGE_USERS = "MANAGE_USERS"
+    MANAGE_PLATFORM = "MANAGE_PLATFORM"
