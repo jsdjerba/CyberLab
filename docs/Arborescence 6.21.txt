@@ -1,0 +1,83 @@
+application/
+├── __init__.py
+├── dto/
+│   ├── __init__.py
+│   └── classroom_response.py
+├── commands/
+│   ├── __init__.py
+│   └── create_classroom_command.py
+├── ports/
+│   ├── __init__.py
+│   ├── classroom_repository.py
+│   ├── unit_of_work.py
+│   ├── clock.py
+│   └── id_generator.py
+└── use_cases/
+    ├── __init__.py
+    └── create_classroom.py
+
+tests/
+└── application/
+    └── classroom/
+        └── test_create_classroom_usecase.py
+
+La bonne métrique pour CyberLab
+
+Je proposerais maintenant de suivre 3 indicateurs séparés :
+
+🏗️ Maturité architecture
+
+≈ 75 %
+
+💻 Code plateforme
+
+≈ 35–40 %
+
+🎓 Produit pédagogique utilisable
+
+≈ 15–20 %
+
+C'est beaucoup plus fidèle.
+
+6) Le prochain saut de progression
+
+Les prochaines étapes auront un impact beaucoup plus visible :
+
+Fin Phase 6.2
+
+(+10 % environ)
+
+Invitations
+Teams
+Enrollment complet
+Infrastructure
+
+(+15 %)
+
+SQLite réel
+Repositories
+UoW réel
+Flask API
+Premier parcours élève
+
+(+20 %)
+
+Scénario :
+
+Professeur crée une classe
+        ↓
+Élève rejoint avec code
+        ↓
+Élève ouvre un Lab
+        ↓
+Résout un challenge
+        ↓
+Score enregistré
+
+À ce moment-là, CyberLab passera probablement de 40 % à 65–70 %.
+
+Donc la baisse apparente vient d'un changement de référence : 
+au début on évaluait surtout le socle architectural, 
+ensuite j'ai évalué le produit complet. 
+La progression réelle est positive ;
+ c'est simplement que le périmètre mesuré est devenu plus large.

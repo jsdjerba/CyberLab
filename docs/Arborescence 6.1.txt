@@ -1,0 +1,35 @@
+domain/
+├── value_objects/
+│   ├── __init__.py
+│   ├── classroom_id.py
+│   ├── tenant_id.py
+│   ├── teacher_id.py
+│   ├── student_id.py
+│   ├── team_id.py
+│   ├── invitation_code.py
+│   ├── classroom_name.py
+│   └── classroom_settings.py
+├── enums/
+│   ├── __init__.py
+│   ├── classroom_status.py
+│   ├── team_type.py
+│   ├── invitation_status.py
+│   └── instructor_role.py
+├── events/
+│   ├── __init__.py
+│   └── classroom_events.py
+├── exceptions/
+│   ├── __init__.py
+│   └── classroom_exceptions.py
+└── entities/
+    ├── __init__.py
+    ├── classroom_member.py
+    ├── classroom_instructor.py
+    ├── team.py
+    ├── invitation.py
+    └── classroom.py
+
+tests/
+└── domain/
+    └── classroom/
+        └── test_classroom_aggregate.py

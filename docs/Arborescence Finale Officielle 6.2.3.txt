@@ -1,0 +1,50 @@
+cyberlab/
+├── domain/
+│   ├── entities/
+│   │   ├── classroom.py
+│   │   └── invitation.py               <-- Entity interne
+│   ├── value_objects/
+│   │   ├── invitation_code.py          <-- Ajouté (validation I,l,O,0)
+│   │   ├── tenant_settings.py          <-- Ajouté (max_validity_hours)
+│   │   └── classroom_settings.py       <-- Mis à jour
+│   ├── events/
+│   │   └── invitation_events.py        <-- Contient Generated/Revoked/Rotated v1
+│   └── exceptions/
+│       └── invitation_exceptions.py
+│
+├── application/
+│   ├── commands/
+│   │   ├── generate_invitation_command.py
+│   │   ├── revoke_invitation_command.py
+│   │   └── rotate_invitation_command.py
+│   ├── queries/
+│   │   └── list_active_invitations_query.py
+│   ├── dto/
+│   │   ├── invitation_response.py
+│   │   └── invitation_list_response.py
+│   ├── use_cases/
+│   │   ├── generate_invitation.py
+│   │   ├── revoke_invitation.py
+│   │   ├── rotate_invitation.py
+│   │   └── list_active_invitations.py
+│   ├── ports/
+│   │   ├── invitation_code_generator.py
+│   │   └── invitation_query_repository.py <-- CQRS Port
+│   ├── policies/
+│   │   └── retry_policy.py             <-- Mis à jour avec Exponential Backoff + Jitter
+│   └── exceptions/
+│       └── invitation_application_exceptions.py
+│
+├── infrastructure/
+│   └── (Réservé pour Phase 7)
+│
+└── tests/
+    ├── domain/
+    │   └── test_invitation_entity.py
+    └── application/
+        └── invitation/
+            ├── test_generate_invitation_usecase.py
+            ├── test_revoke_invitation_usecase.py
+            ├── test_rotate_invitation_usecase.py
+            ├── test_list_active_invitations_query.py
+            └── test_retry_policy_jitter.py

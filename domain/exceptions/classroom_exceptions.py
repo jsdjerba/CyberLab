@@ -1,0 +1,8 @@
+class ClassroomDomainException(Exception): pass
+class ClassroomArchivedException(ClassroomDomainException): pass
+class ClassroomCapacityExceededException(ClassroomDomainException): pass
+class InvalidInvitationException(ClassroomDomainException): pass
+class StudentAlreadyEnrolledException(ClassroomDomainException): pass
+class StudentNotInClassroomException(ClassroomDomainException): pass
+class InstructorManagementException(ClassroomDomainException): pass
+class TeamManagementException(ClassroomDomainException): pass

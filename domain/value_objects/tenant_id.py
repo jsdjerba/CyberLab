@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 
 @dataclass(frozen=True)
-class StudentId:
-    value: str
+class TenantId:
+    value: str = "DEFAULT"
 
     def __post_init__(self):
         if self.value is None or not str(self.value).strip():
-            raise ValueError("StudentId ne peut pas être vide.")
+            raise ValueError("TenantId ne peut pas être vide.")
         object.__setattr__(self, 'value', str(self.value).strip())
