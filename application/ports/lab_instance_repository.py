@@ -1,8 +1,20 @@
+"""
+Port Repository pour LabInstance (Clean Architecture).
+"""
+
 from typing import Protocol, Optional
-from domain.labs.entities.lab_instance import LabInstance
+from domain.entities.lab_instance import LabInstance
+
 
 class LabInstanceRepository(Protocol):
-    def get_by_id(self, instance_id: str) -> Optional[LabInstance]:
-        ...
     def save(self, instance: LabInstance) -> None:
+        ...
+
+    def find_by_id(self, student_id: str, lab_id: str) -> Optional[LabInstance]:
+        ...
+
+    def delete(self, student_id: str, lab_id: str) -> None:
+        ...
+
+    def exists(self, student_id: str, lab_id: str) -> bool:
         ...

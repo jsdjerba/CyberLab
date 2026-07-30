@@ -1,0 +1,39 @@
+application/
+├── ports/
+│   ├── __init__.py
+│   ├── lab_instance_repository.py
+│   ├── flag_validator.py
+│   └── unit_of_work.py
+├── use_cases/
+│   ├── __init__.py
+│   ├── create_lab_instance.py
+│   ├── start_lab.py
+│   ├── submit_flag.py
+│   └── get_lab_instance.py
+└── services/
+    └── container.py
+
+infrastructure/
+├── database.py
+├── persistence/
+│   ├── models/
+│   ├── mappers/
+│   └── repositories/
+│       └── sqlalchemy_lab_instance_repository.py
+└── transaction/
+    └── sqlalchemy_unit_of_work.py
+
+presentation/
+├── __init__.py
+├── api/
+│   └── v1/
+│       ├── labs_routes.py
+│       └── health_routes.py
+├── controllers/
+│   └── lab_controller.py
+├── schemas/
+│   ├── lab_schema.py
+│   └── flag_schema.py
+└── middleware/
+    ├── request_id.py
+    └── error_handler.py

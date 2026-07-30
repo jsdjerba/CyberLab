@@ -1,0 +1,16 @@
+presentation/
+├── api/
+│   └── v1/
+│       ├── __init__.py
+│       └── auth_routes.py
+├── schemas/
+│   ├── __init__.py
+│   └── auth_schema.py
+└── error_handlers/
+    ├── __init__.py
+    └── api_exception_handler.py
+
+tests/presentation/
+├── test_auth_register_api.py
+├── test_auth_login_api.py
+└── test_auth_errors_api.py

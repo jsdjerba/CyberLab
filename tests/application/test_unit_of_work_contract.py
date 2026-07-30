@@ -1,19 +1,34 @@
-import pytest
-from application.ports.unit_of_work import AbstractUnitOfWork
+"""
+Tests de contrat pour le port UnitOfWork.
+"""
 
-class DummyUoW(AbstractUnitOfWork):
+import pytest
+from application.ports.unit_of_work import UnitOfWork
+
+
+class DummyUoW:
+    """Implémentation factice (Dummy) pour tester le contrat UoW."""
     def __init__(self):
         self.committed = False
         self.rolled_back = False
 
-    def commit(self) -> None:
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type:
+            self.rollback()
+        else:
+            self.commit()
+
+    def commit(self):
         self.committed = True
+        self.rolled_back = False
 
-    def rollback(self) -> None:
+    def rollback(self):
         self.rolled_back = True
+        self.committed = False
 
-    def collect_events(self) -> list:
-        return []
 
 def test_uow_context_manager_success():
     uow = DummyUoW()
@@ -21,6 +36,7 @@ def test_uow_context_manager_success():
         pass
     assert uow.committed is True
     assert uow.rolled_back is False
+
 
 def test_uow_context_manager_exception():
     uow = DummyUoW()

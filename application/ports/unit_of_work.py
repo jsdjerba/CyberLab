@@ -1,33 +1,27 @@
-from abc import ABC, abstractmethod
-from typing import List, Any
+"""
+Port Unit of Work (Clean Architecture).
+Définit les contrats d'abstraction pour la gestion transactionnelle.
+"""
 
-class AbstractUnitOfWork(ABC):
-    """
-    Port (Interface) applicatif pour l'Unit of Work.
-    Gère les limites transactionnelles et la coordination des repositories,
-    tout en préparant la collecte des Domain Events.
-    """
-    
-    def __enter__(self) -> 'AbstractUnitOfWork':
-        return self
+from typing import Protocol, runtime_checkable
 
-    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
-        if exc_type is not None:
-            self.rollback()
-        else:
-            self.commit()
 
-    @abstractmethod
+@runtime_checkable
+class UnitOfWork(Protocol):
+    """Contrat d'abstraction agnostique pour l'Unit of Work."""
+
+    def __enter__(self) -> "UnitOfWork":
+        ...
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        ...
+
     def commit(self) -> None:
-        """Valide la transaction en cours et déclenche la persistance physique."""
-        raise NotImplementedError
+        ...
 
-    @abstractmethod
     def rollback(self) -> None:
-        """Annule la transaction en cours en cas d'erreur."""
-        raise NotImplementedError
+        ...
 
-    @abstractmethod
-    def collect_events(self) -> List[Any]:
-        """Collecte les Domain Events générés par les agrégats suivis."""
-        raise NotImplementedError
+
+# Alias de rétrocompatibilité pour les tests existants du projet
+AbstractUnitOfWork = UnitOfWork

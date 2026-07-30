@@ -1,0 +1,25 @@
+domain/
+├── entities/
+│   └── user.py
+├── value_objects/
+│   ├── user_id.py
+│   ├── email.py
+│   ├── password_hash.py
+│   └── role.py
+├── events/
+│   ├── user_registered.py
+│   └── user_logged_in.py
+├── exceptions/
+│   └── auth_exceptions.py
+└── repositories/
+    └── user_repository.py
+
+application/
+└── ports/
+    └── password_hasher.py
+
+tests/
+└── domain/
+    ├── test_user_entity.py
+    ├── test_user_value_objects.py
+    └── test_auth_events.py

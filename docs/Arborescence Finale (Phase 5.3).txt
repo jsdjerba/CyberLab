@@ -1,0 +1,25 @@
+infrastructure/
+├── identity/
+│   ├── __init__.py
+│   └── uuid_id_generator.py
+├── persistence/
+│   ├── mappers/
+│   │   ├── __init__.py
+│   │   └── user_mapper.py
+│   ├── models/
+│   │   ├── __init__.py
+│   │   └── user_model.py
+│   └── repositories/
+│       └── sqlalchemy_user_repository.py
+├── security/
+│   ├── __init__.py
+│   ├── bcrypt_password_hasher.py
+│   └── jwt_token_provider.py
+└── container.py
+
+tests/infrastructure/
+├── test_uuid_generator.py
+├── test_bcrypt_password_hasher.py
+├── test_jwt_token_provider.py
+├── test_user_mapper.py
+└── test_sqlalchemy_user_repository.py

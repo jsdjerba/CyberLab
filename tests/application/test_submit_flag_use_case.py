@@ -1,121 +1,109 @@
+"""
+Tests unitaires TDD pour SubmitFlagUseCase.
+"""
+
 import pytest
-from datetime import datetime
-from application.use_cases.submit_flag_use_case import SubmitFlagUseCase
-from domain.exceptions import LabInstanceNotFoundError, LabNotFoundError
-from application.dtos.validation_result_dto import ValidationResult
+from datetime import datetime, timezone
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
-# --- Fakes alignés sur les contrats stricts de l'Application ---
+from infrastructure.database import Base
+from infrastructure.persistence.repositories.sqlalchemy_lab_instance_repository import SqlAlchemyLabInstanceRepository
+from application.use_cases.start_lab import StartLabUseCase, StartLabCommand
+from application.use_cases.submit_flag import SubmitFlagUseCase, SubmitFlagCommand
+from domain.value_objects.objective_id import ObjectiveId
+from domain.value_objects.lab_status import LabStatus
+from domain.exceptions import LabInstanceNotFoundError, LabAlreadyCompletedException
 
-class FakeAttemptPolicyService:
-    def can_attempt(self, instance, step_id, policy, current_time) -> bool:
-        return True
 
-class FakeChallengeValidationPort:
-    def __init__(self, result: ValidationResult):
-        self.result = result
-        
-    def validate(self, lab_id: str, step_id: str, submitted_answer: str) -> ValidationResult:
-        return self.result
+class DummyValidator:
+    def validate(self, flag: str, objective_id: ObjectiveId) -> bool:
+        return flag == "CTF{correct_flag}"
 
-class FakeScoringService:
-    def calculate_score(self, base_points: int, attempts_count: int, elapsed_time_seconds: int) -> int:
-        return base_points
 
-# --- Dummies pour l'Infrastructure ---
+@pytest.fixture
+def db_session():
+    engine = create_engine("sqlite:///:memory:")
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    yield session
+    session.rollback()
+    session.close()
 
-class DummyLabRepo:
-    def __init__(self, lab=None):
-        self._lab = lab
-    def get_by_id(self, lab_id):
-        return self._lab
 
-class DummyInstanceRepo:
-    def __init__(self, instance=None):
-        self._instance = instance
-    def get_by_id(self, instance_id):
-        return self._instance
-    def save(self, instance):
-        pass
+def test_submit_correct_flag_completes_lab(db_session):
+    repo = SqlAlchemyLabInstanceRepository(db_session)
+    obj_id = ObjectiveId("obj-1")
 
-class DummyStudentRepo:
-    pass
+    # 1. Démarrer le lab d'abord
+    start_uc = StartLabUseCase(repo)
+    start_uc.execute(StartLabCommand(
+        student_id="student-202",
+        lab_id="cyber-lab-2",
+        correlation_id="corr-start",
+        objectives=[obj_id]
+    ))
 
-class DummyEventBus:
-    def publish(self, events):
-        pass
+    # 2. Soumettre le bon flag via le use case
+    submit_uc = SubmitFlagUseCase(repo, DummyValidator())
+    result = submit_uc.execute(SubmitFlagCommand(
+        student_id="student-202",
+        lab_id="cyber-lab-2",
+        objective_id="obj-1",
+        submitted_flag="CTF{correct_flag}",
+        correlation_id="corr-sub-1",
+        current_time=datetime.now(timezone.utc)
+    ))
 
-# --- Mocks simples des entités pour le test ---
+    assert result.is_correct is True
+    assert result.status == LabStatus.COMPLETED.name
+    assert result.objective_id == "obj-1"
 
-class DummyCommand:
-    def __init__(self, instance_id, lab_id, step_id, submitted_flag):
-        self.instance_id = instance_id
-        self.lab_id = lab_id
-        self.step_id = step_id
-        self.submitted_flag = submitted_flag
 
-class DummyStep:
-    def __init__(self, step_id, points=10):
-        self.id = step_id
-        self.points = points
+def test_submit_flag_on_non_existent_lab_raises_exception(db_session):
+    repo = SqlAlchemyLabInstanceRepository(db_session)
+    submit_uc = SubmitFlagUseCase(repo, DummyValidator())
 
-class DummyLab:
-    def __init__(self, steps):
-        self.steps = steps
-    def get_step(self, step_id):
-        for s in self.steps:
-            if s.id == step_id:
-                return s
-        raise ValueError("Step not found")
+    with pytest.raises(LabInstanceNotFoundError):
+        submit_uc.execute(SubmitFlagCommand(
+            student_id="ghost-student",
+            lab_id="ghost-lab",
+            objective_id="obj-1",
+            submitted_flag="CTF{wrong}",
+            correlation_id="corr-1"
+        ))
 
-class DummyInstance:
-    def __init__(self):
-        self.completed_steps = []
-        self.attempts = {}
-        self.score = 0
+
+def test_submit_flag_on_completed_lab_raises_exception(db_session):
+    repo = SqlAlchemyLabInstanceRepository(db_session)
+    obj_id = ObjectiveId("obj-1")
+
+    start_uc = StartLabUseCase(repo)
+    start_uc.execute(StartLabCommand(
+        student_id="student-303",
+        lab_id="cyber-lab-3",
+        correlation_id="corr-start",
+        objectives=[obj_id]
+    ))
+
+    submit_uc = SubmitFlagUseCase(repo, DummyValidator())
     
-    def get_attempt_count(self, step_id):
-        return self.attempts.get(step_id, 0)
-        
-    def complete_step(self, step_id, lab):
-        self.completed_steps.append(step_id)
+    # Première soumission réussie
+    submit_uc.execute(SubmitFlagCommand(
+        student_id="student-303",
+        lab_id="cyber-lab-3",
+        objective_id="obj-1",
+        submitted_flag="CTF{correct_flag}",
+        correlation_id="corr-sub-1"
+    ))
 
-    def record_attempt(self, step_id, current_time):
-        self.attempts[step_id] = self.attempts.get(step_id, 0) + 1
-        
-    def add_score(self, points):
-        self.score += points
-
-# --- Tests ---
-
-def test_submit_flag_success_removes_duck_typing():
-    # 1. Arrange
-    command = DummyCommand(
-        instance_id="inst_1", 
-        lab_id="lab_1", 
-        step_id="step_1", 
-        submitted_flag="FLAG{correct}"
-    )
-    
-    step = DummyStep(step_id="step_1")
-    lab = DummyLab(steps=[step])
-    instance = DummyInstance()
-    
-    use_case = SubmitFlagUseCase(
-        lab_repository=DummyLabRepo(lab),
-        lab_instance_repository=DummyInstanceRepo(instance),
-        student_repository=DummyStudentRepo(),
-        event_bus=DummyEventBus(),
-        attempt_policy_service=FakeAttemptPolicyService(),
-        challenge_validation_port=FakeChallengeValidationPort(ValidationResult(success=True)),
-        scoring_service=FakeScoringService(),
-        time_provider=lambda: datetime(2026, 1, 1) # Injection déterministe
-    )
-
-    # 2. Act
-    result = use_case.execute(command)
-
-    # 3. Assert
-    assert result is True
-    assert "step_1" in instance.completed_steps
-    assert instance.get_attempt_count("step_1") == 0 # Pas de tentative ratée enregistrée
-    assert instance.score == 10
+    # Deuxième soumission sur lab déjà complété doit lever une exception
+    with pytest.raises(LabAlreadyCompletedException):
+        submit_uc.execute(SubmitFlagCommand(
+            student_id="student-303",
+            lab_id="cyber-lab-3",
+            objective_id="obj-1",
+            submitted_flag="CTF{correct_flag}",
+            correlation_id="corr-sub-2"
+        ))

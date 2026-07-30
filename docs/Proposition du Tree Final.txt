@@ -1,0 +1,35 @@
+infrastructure/
+└── container.py
+
+presentation/
+├── __init__.py
+├── api/
+│   ├── __init__.py
+│   └── v1/
+│       ├── __init__.py
+│       ├── labs_routes.py
+│       ├── students_routes.py
+│       ├── gamification_routes.py
+│       └── health_routes.py
+├── controllers/
+│   ├── __init__.py
+│   ├── lab_controller.py
+│   └── error_controller.py
+├── schemas/
+│   ├── __init__.py
+│   ├── lab_schema.py
+│   ├── flag_schema.py
+│   └── response_schema.py
+└── middleware/
+    ├── __init__.py
+    ├── request_id.py
+    └── error_handler.py
+
+tests/
+└── api/
+    ├── __init__.py
+    ├── test_lab_creation_api.py
+    ├── test_lab_start_api.py
+    ├── test_flag_submission_api.py
+    ├── test_error_handling_api.py
+    └── test_security_headers.py
