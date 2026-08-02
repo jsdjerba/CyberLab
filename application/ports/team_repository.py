@@ -1,0 +1,6 @@
+from typing import Protocol, Optional
+from domain.team.aggregate import Team
+
+class TeamRepository(Protocol):
+    def find_by_id(self, team_id: str) -> Optional[Team]: ...
+    def save(self, team: Team) -> None: ...
