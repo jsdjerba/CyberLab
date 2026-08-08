@@ -22,7 +22,7 @@ class CreateTeamUseCase:
         team_id = self._id_gen.generate()
         event_id = self._id_gen.generate()
         
-        # Mutation pure, en dehors de la Retry Policy
+        # Le cast est déjà géré par la frontière HTTP. On passe directement 'command.color'
         team = Team.create(
             team_id=TeamId(team_id),
             classroom_id=ClassroomId(command.classroom_id),
@@ -40,6 +40,7 @@ class CreateTeamUseCase:
                 self._uow.register_events(events)
                 self._uow.commit()
 
+        # Indentation corrigée : l'exécution se fait au niveau de execute()
         self._retry_policy.execute(persist)
         
         return TeamMutationResponseDTO(team_id=team_id, event_id=event_id, status="SUCCESS")
